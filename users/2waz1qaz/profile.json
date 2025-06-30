@@ -2,5 +2,12 @@
   "username": "2waz1qaz",
   "password": "1",
   "createdAt": "2025-06-30T21:40:14.947Z",
-  "servers": []
+  "servers": [
+    {
+      "code": "EYALVR",
+      "name": "Waz",
+      "isOwner": true,
+      "joinedAt": "2025-06-30T21:41:32.786Z"
+    }
+  ]
 }
