@@ -6,5 +6,13 @@
   "members": [
     "2waz1qaz"
   ],
-  "messages": []
+  "messages": [
+    {
+      "id": 1751319943465,
+      "type": "user",
+      "author": "2waz1qaz",
+      "content": "?",
+      "timestamp": "2025-06-30T21:45:43.465Z"
+    }
+  ]
 }
