@@ -2,12 +2,5 @@
   "username": "2waz1qaz",
   "password": "1",
   "createdAt": "2025-06-30T21:40:14.947Z",
-  "servers": [
-    {
-      "code": "ZHVZ6Z",
-      "name": "Waz",
-      "isOwner": true,
-      "joinedAt": "2025-06-30T21:40:35.960Z"
-    }
-  ]
+  "servers": []
 }
