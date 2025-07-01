@@ -5,5 +5,10 @@
     "createdAt": "2025-07-01T11:27:41.871Z",
     "status": "online",
     "lastSeen": "2025-07-01T11:31:37.797Z"
+  },
+  "Gusick": {
+    "password": "1509442",
+    "createdAt": "2025-07-01T11:33:52.557Z",
+    "status": "offline"
   }
 }
