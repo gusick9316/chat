@@ -19,7 +19,6 @@
             align-items: center;
             justify-content: center;
             overflow-x: hidden;
-            touch-action: pan-y;
         }
 
         .container {
@@ -34,7 +33,7 @@
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
         }
 
-        /* 가로 모드 지원 - 수정된 부분 */
+        /* 가로 모드 지원 */
         @media (orientation: landscape) and (max-height: 600px) {
             body {
                 align-items: flex-start;
@@ -56,17 +55,6 @@
             
             .chat-container {
                 height: calc(100% - 20px);
-            }
-
-            /* 서버 목록 스타일 수정 (가로 스와이프 제거) */
-            .server-list {
-                max-height: calc(100vh - 200px); /* 더 많은 공간 확보 */
-                overflow-y: auto;
-                margin-bottom: 15px;
-            }
-
-            .server-item {
-                margin-bottom: 10px; /* 아이템 간격 유지 */
             }
         }
 
@@ -524,853 +512,830 @@
 <body>
     <div class="container">
         <!-- 로그인/회원가입 화면 -->
-        <div id="loginScreen" class="screen active">
-            <h1 class="title">와즈 Chat!</h1>
-            <div class="form-group">
-                <label for="username">사용자명</label>
-                <input type="text" id="username" placeholder="사용자명을 입력하세요">
-            </div>
-            <div class="form-group">
-                <label for="password">비밀번호</label>
-                <input type="password" id="password" placeholder="비밀번호를 입력하세요">
-            </div>
-            <button class="btn btn-primary" onclick="login()">로그인</button>
-            <button class="btn btn-secondary" onclick="showRegister()">계정 생성</button>
-        </div>
+<div id="loginScreen" class="screen active">
+    <h1 class="title">와즈 Chat!</h1>
+    <div class="form-group">
+        <label for="username">사용자명</label>
+        <input type="text" id="username" placeholder="사용자명을 입력하세요">
+    </div>
+    <div class="form-group">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" placeholder="비밀번호를 입력하세요">
+    </div>
+    <button class="btn btn-primary" onclick="login()">로그인</button>
+    <button class="btn btn-secondary" onclick="showRegister()">계정 생성</button>
+</div>
 
-        <!-- 회원가입 화면 -->
-        <div id="registerScreen" class="screen">
-            <button class="back-btn" onclick="showLogin()">←</button>
-            <h1 class="title">계정 생성</h1>
-            <div class="form-group">
-                <label for="regUsername">사용자명</label>
-                <input type="text" id="regUsername" placeholder="사용자명을 입력하세요">
-            </div>
-            <div class="form-group">
-                <label for="regPassword">비밀번호</label>
-                <input type="password" id="regPassword" placeholder="비밀번호를 입력하세요">
-            </div>
-            <div class="form-group">
-                <label for="regPasswordConfirm">비밀번호 확인</label>
-                <input type="password" id="regPasswordConfirm" placeholder="비밀번호를 다시 입력하세요">
-            </div>
-            <button class="btn btn-primary" onclick="register()">계정 생성</button>
-        </div>
+<!-- 회원가입 화면 -->
+<div id="registerScreen" class="screen">
+    <button class="back-btn" onclick="showLogin()">←</button>
+    <h1 class="title">계정 생성</h1>
+    <div class="form-group">
+        <label for="regUsername">사용자명</label>
+        <input type="text" id="regUsername" placeholder="사용자명을 입력하세요">
+    </div>
+    <div class="form-group">
+        <label for="regPassword">비밀번호</label>
+        <input type="password" id="regPassword" placeholder="비밀번호를 입력하세요">
+    </div>
+    <div class="form-group">
+        <label for="regPasswordConfirm">비밀번호 확인</label>
+        <input type="password" id="regPasswordConfirm" placeholder="비밀번호를 다시 입력하세요">
+    </div>
+    <button class="btn btn-primary" onclick="register()">계정 생성</button>
+</div>
 
-        <!-- 로딩 화면 -->
-        <div id="loadingScreen" class="screen">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>로딩중...</p>
-            </div>
-        </div>
+<!-- 로딩 화면 -->
+<div id="loadingScreen" class="screen">
+    <div class="loading">
+        <div class="spinner"></div>
+        <p>로딩중...</p>
+    </div>
+</div>
 
-        <!-- 서버 목록 화면 -->
-        <div id="serverListScreen" class="screen">
-            <div class="chat-header">
-                <div class="chat-header-top">
-                    <span id="serverListTitle">서버 목록</span>
-                    <div class="chat-header-buttons">
-                        <button class="header-btn settings-btn" onclick="showServerSettings()" title="설정">⚙️</button>
-                    </div>
-                </div>
-            </div>
-            <div class="top-buttons">
-                <button class="btn btn-primary" onclick="showCreateServer()">서버 생성</button>
-                <button class="btn btn-secondary" onclick="showJoinServer()">서버 참여</button>
-            </div>
-            <div class="server-list-container">
-                <div class="server-list" id="serverList">
-                    <div class="empty-state">
-                        <p>서버가 없습니다</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 새로운 서버 설정 모달 추가 -->
-        <div id="serverSettingsModal" class="modal">
-            <div class="modal-content">
-                <h3 style="margin-bottom: 20px;">사용자 설정</h3>
-                
-                <div class="settings-item">
-                    <label>사용자 ID</label>
-                    <input type="text" id="displayUserId" readonly style="background: #f8f9fa;">
-                </div>
-                
-                <div class="settings-item">
-                    <label for="editUsername">사용자명</label>
-                    <input type="text" id="editUsername" placeholder="새로운 사용자명">
-                    <button class="btn btn-secondary" onclick="updateUsername()" style="margin-top: 10px; padding: 10px 15px; font-size: 14px;">이름 변경</button>
-                </div>
-                
-                <div class="settings-item">
-                    <button class="btn btn-danger" onclick="logout()">로그아웃</button>
-                </div>
-                
-                <button class="btn btn-secondary" onclick="closeModal('serverSettingsModal')">닫기</button>
-            </div>
-        </div>
-
-        <!-- 채팅 화면 -->
-        <div id="chatScreen" class="screen">
-            <div class="chat-container">
-                <div class="chat-header">
-                    <div class="chat-header-top">
-                        <button class="back-btn" onclick="showServerList()">←</button>
-                        <span id="chatTitle"></span>
-                        <div class="chat-header-buttons">
-                            <button class="header-btn user-list-btn" onclick="toggleUserList()" title="사용자 목록">👥</button>
-                            <button class="header-btn settings-btn" onclick="showSettings()" title="설정">⚙️</button>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="user-list" id="userList">
-                    <h4 style="margin-bottom: 10px;">접속자 목록</h4>
-                </div>
-                
-                <div class="chat-messages" id="chatMessages"></div>
-                
-                <div class="message-input">
-                    <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." onkeypress="if(event.key==='Enter')sendMessage()">
-                    <button onclick="sendMessage()">전송</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 모달들 -->
-        <div id="createServerModal" class="modal">
-            <div class="modal-content">
-                <h3 style="margin-bottom: 20px;">서버 생성</h3>
-                <div class="form-group">
-                    <label for="serverName">서버 이름</label>
-                    <input type="text" id="serverName" placeholder="서버 이름을 입력하세요">
-                </div>
-                <button class="btn btn-primary" onclick="createServer()">생성</button>
-                <button class="btn btn-secondary" onclick="closeModal('createServerModal')">취소</button>
-            </div>
-        </div>
-
-        <div id="joinServerModal" class="modal">
-            <div class="modal-content">
-                <h3 style="margin-bottom: 20px;">서버 참여</h3>
-                <div class="form-group">
-                    <label for="serverCode">서버 코드</label>
-                    <input type="text" id="serverCode" placeholder="8자리 서버 코드를 입력하세요" maxlength="8">
-                </div>
-                <button class="btn btn-primary" onclick="joinServer()">참여</button>
-                <button class="btn btn-secondary" onclick="closeModal('joinServerModal')">취소</button>
-            </div>
-        </div>
-
-        <div id="settingsModal" class="modal">
-            <div class="modal-content">
-                <h3 style="margin-bottom: 20px;">서버 설정</h3>
-                <div class="settings-item">
-                    <label for="editServerName">서버 이름</label>
-                    <input type="text" id="editServerName" placeholder="서버 이름">
-                    <button class="btn btn-secondary" onclick="updateServerName()" style="margin-top: 10px; padding: 10px 15px; font-size: 14px;">이름 변경</button>
-                </div>
-                <div class="settings-item">
-                    <label>서버 코드</label>
-                    <input type="text" id="displayServerCode" readonly style="background: #f8f9fa;">
-                </div>
-                <div class="settings-item">
-                    <button class="btn btn-danger" id="deleteLeaveBtn" onclick="deleteOrLeaveServer()">서버 삭제</button>
-                </div>
-                <button class="btn btn-secondary" onclick="closeModal('settingsModal')">닫기</button>
+<!-- 서버 목록 화면 -->
+<div id="serverListScreen" class="screen">
+    <div class="chat-header">
+        <div class="chat-header-top">
+            <span id="serverListTitle">서버 목록</span>
+            <div class="chat-header-buttons">
+                <button class="header-btn settings-btn" onclick="showServerSettings()" title="설정">⚙️</button>
             </div>
         </div>
     </div>
+    <div class="top-buttons">
+        <button class="btn btn-primary" onclick="showCreateServer()">서버 생성</button>
+        <button class="btn btn-secondary" onclick="showJoinServer()">서버 참여</button>
+    </div>
+    <div class="server-list" id="serverList">
+        <div class="empty-state">
+            <p>서버가 없습니다</p>
+        </div>
+    </div>
+</div>
 
-    <script>
-        // 전역 변수
-        let currentUser = null;
-        let currentServer = null;
-        let servers = [];
-        let users = [];
-        let messages = [];
-        let currentScreen = 'loginScreen';
-        let refreshInterval;
-        let lastActivityTime = Date.now();
+<!-- 새로운 서버 설정 모달 추가 -->
+<div id="serverSettingsModal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-bottom: 20px;">사용자 설정</h3>
         
-        // GitHub 설정
-        const GITHUB_CONFIG = {
-            username: 'gusick9316',
-            repo: 'chat',
-            token: 'ghp' + '_2SllyukhLwajJQdMsP0xgu9uaR5fDv2gvE0T'
+        <div class="settings-item">
+            <label>사용자 ID</label>
+            <input type="text" id="displayUserId" readonly style="background: #f8f9fa;">
+        </div>
+        
+        <div class="settings-item">
+            <label for="editUsername">사용자명</label>
+            <input type="text" id="editUsername" placeholder="새로운 사용자명">
+            <button class="btn btn-secondary" onclick="updateUsername()" style="margin-top: 10px; padding: 10px 15px; font-size: 14px;">이름 변경</button>
+        </div>
+        
+        <div class="settings-item">
+            <button class="btn btn-danger" onclick="logout()">로그아웃</button>
+        </div>
+        
+        <button class="btn btn-secondary" onclick="closeModal('serverSettingsModal')">닫기</button>
+    </div>
+</div>
+
+<!-- 채팅 화면 -->
+<div id="chatScreen" class="screen">
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="chat-header-top">
+                <button class="back-btn" onclick="showServerList()">←</button>
+                <span id="chatTitle"></span>
+                <div class="chat-header-buttons">
+                    <button class="header-btn user-list-btn" onclick="toggleUserList()" title="사용자 목록">👥</button>
+                    <button class="header-btn settings-btn" onclick="showSettings()" title="설정">⚙️</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="user-list" id="userList">
+            <h4 style="margin-bottom: 10px;">접속자 목록</h4>
+        </div>
+        
+        <div class="chat-messages" id="chatMessages"></div>
+        
+        <div class="message-input">
+            <input type="text" id="messageInput" placeholder="메시지를 입력하세요..." onkeypress="if(event.key==='Enter')sendMessage()">
+            <button onclick="sendMessage()">전송</button>
+        </div>
+    </div>
+</div>
+
+<!-- 모달들 -->
+<div id="createServerModal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-bottom: 20px;">서버 생성</h3>
+        <div class="form-group">
+            <label for="serverName">서버 이름</label>
+            <input type="text" id="serverName" placeholder="서버 이름을 입력하세요">
+        </div>
+        <button class="btn btn-primary" onclick="createServer()">생성</button>
+        <button class="btn btn-secondary" onclick="closeModal('createServerModal')">취소</button>
+    </div>
+</div>
+
+<div id="joinServerModal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-bottom: 20px;">서버 참여</h3>
+        <div class="form-group">
+            <label for="serverCode">서버 코드</label>
+            <input type="text" id="serverCode" placeholder="8자리 서버 코드를 입력하세요" maxlength="8">
+        </div>
+        <button class="btn btn-primary" onclick="joinServer()">참여</button>
+        <button class="btn btn-secondary" onclick="closeModal('joinServerModal')">취소</button>
+    </div>
+</div>
+
+<div id="settingsModal" class="modal">
+    <div class="modal-content">
+        <h3 style="margin-bottom: 20px;">서버 설정</h3>
+        <div class="settings-item">
+            <label for="editServerName">서버 이름</label>
+            <input type="text" id="editServerName" placeholder="서버 이름">
+            <button class="btn btn-secondary" onclick="updateServerName()" style="margin-top: 10px; padding: 10px 15px; font-size: 14px;">이름 변경</button>
+        </div>
+        <div class="settings-item">
+            <label>서버 코드</label>
+            <input type="text" id="displayServerCode" readonly style="background: #f8f9fa;">
+        </div>
+        <div class="settings-item">
+            <button class="btn btn-danger" id="deleteLeaveBtn" onclick="deleteOrLeaveServer()">서버 삭제</button>
+        </div>
+        <button class="btn btn-secondary" onclick="closeModal('settingsModal')">닫기</button>
+    </div>
+</div>
+
+<script>
+    // 전역 변수
+    let currentUser = null;
+    let currentServer = null;
+    let servers = [];
+    let users = [];
+    let messages = [];
+    let currentScreen = 'loginScreen';
+    let refreshInterval;
+    let lastActivityTime = Date.now();
+    
+    // GitHub 설정
+    const GITHUB_CONFIG = {
+        username: 'gusick9316',
+        repo: 'chat',
+        token: 'ghp' + '_2SllyukhLwajJQdMsP0xgu9uaR5fDv2gvE0T'
+    };
+
+    // GitHub API 함수들
+    async function githubRequest(path, method = 'GET', data = null) {
+        const url = `https://api.github.com/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/contents/${path}`;
+        const options = {
+            method,
+            headers: {
+                'Authorization': `token ${GITHUB_CONFIG.token}`,
+                'Content-Type': 'application/json',
+            }
         };
+        
+        if (data) {
+            options.body = JSON.stringify(data);
+        }
+        
+        try {
+            const response = await fetch(url, options);
+            if (response.ok) {
+                return await response.json();
+            }
+            return null;
+        } catch (error) {
+            console.error('GitHub API 오류:', error);
+            return null;
+        }
+    }
 
-        // GitHub API 함수들
-        async function githubRequest(path, method = 'GET', data = null) {
-            const url = `https://api.github.com/repos/${GITHUB_CONFIG.username}/${GITHUB_CONFIG.repo}/contents/${path}`;
-            const options = {
-                method,
-                headers: {
-                    'Authorization': `token ${GITHUB_CONFIG.token}`,
-                    'Content-Type': 'application/json',
-                }
+    async function saveToGitHub(filename, content) {
+        try {
+            const existingFile = await githubRequest(filename);
+            const encodedContent = btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2))));
+            
+            const data = {
+                message: `Update ${filename}`,
+                content: encodedContent
             };
             
-            if (data) {
-                options.body = JSON.stringify(data);
+            if (existingFile) {
+                data.sha = existingFile.sha;
             }
             
-            try {
-                const response = await fetch(url, options);
-                if (response.ok) {
-                    return await response.json();
-                }
-                return null;
-            } catch (error) {
-                console.error('GitHub API 오류:', error);
-                return null;
+            return await githubRequest(filename, 'PUT', data);
+        } catch (error) {
+            console.error('GitHub 저장 오류:', error);
+            return false;
+        }
+    }
+
+    async function loadFromGitHub(filename) {
+        try {
+            const file = await githubRequest(filename);
+            if (file && file.content) {
+                const decodedContent = decodeURIComponent(escape(atob(file.content)));
+                return JSON.parse(decodedContent);
             }
+            return null;
+        } catch (error) {
+            console.error('GitHub 로드 오류:', error);
+            return null;
         }
+    }
 
-        async function saveToGitHub(filename, content) {
-            try {
-                const existingFile = await githubRequest(filename);
-                const encodedContent = btoa(unescape(encodeURIComponent(JSON.stringify(content, null, 2))));
-                
-                const data = {
-                    message: `Update ${filename}`,
-                    content: encodedContent
-                };
-                
-                if (existingFile) {
-                    data.sha = existingFile.sha;
-                }
-                
-                return await githubRequest(filename, 'PUT', data);
-            } catch (error) {
-                console.error('GitHub 저장 오류:', error);
-                return false;
-            }
-        }
-
-        async function loadFromGitHub(filename) {
-            try {
-                const file = await githubRequest(filename);
-                if (file && file.content) {
-                    const decodedContent = decodeURIComponent(escape(atob(file.content)));
-                    return JSON.parse(decodedContent);
-                }
-                return null;
-            } catch (error) {
-                console.error('GitHub 로드 오류:', error);
-                return null;
-            }
-        }
-
-        // 초기화
-        async function init() {
-            showScreen('loadingScreen');
-            
-            // 데이터 로드
-            const userData = await loadFromGitHub('users.json');
-            const serverData = await loadFromGitHub('servers.json');
-            
-            if (userData) users = userData;
-            if (serverData) servers = serverData;
-            
-            // 로그인 상태 확인
-            const savedUser = localStorage.getItem('currentUser');
-            if (savedUser) {
-                currentUser = JSON.parse(savedUser);
-                showServerList();
-            } else {
-                showScreen('loginScreen');
-            }
-            
-            // 활동 추적 이벤트 설정
-            document.addEventListener('mousemove', updateActivity);
-            document.addEventListener('keypress', updateActivity);
-            document.addEventListener('click', updateActivity);
-            
-            // 자동 새로고침 시작
-            refreshInterval = setInterval(autoRefresh, 1500);
-        }
-
-        function updateActivity() {
-            lastActivityTime = Date.now();
-        }
-
-        // 화면 전환
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(screen => {
-                screen.classList.remove('active');
-            });
-            document.getElementById(screenId).classList.add('active');
-            currentScreen = screenId;
-        }
-
-        // 로그인/회원가입 관련
-        function showLogin() {
+    // 초기화
+    async function init() {
+        showScreen('loadingScreen');
+        
+        // 데이터 로드
+        const userData = await loadFromGitHub('users.json');
+        const serverData = await loadFromGitHub('servers.json');
+        
+        if (userData) users = userData;
+        if (serverData) servers = serverData;
+        
+        // 로그인 상태 확인
+        const savedUser = localStorage.getItem('currentUser');
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+            showServerList();
+        } else {
             showScreen('loginScreen');
         }
+        
+        // 활동 추적 이벤트 설정
+        document.addEventListener('mousemove', updateActivity);
+        document.addEventListener('keypress', updateActivity);
+        document.addEventListener('click', updateActivity);
+        
+        // 자동 새로고침 시작
+        refreshInterval = setInterval(autoRefresh, 1500);
+    }
 
-        function showRegister() {
-            showScreen('registerScreen');
+    function updateActivity() {
+        lastActivityTime = Date.now();
+    }
+
+    // 화면 전환
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(screen => {
+            screen.classList.remove('active');
+        });
+        document.getElementById(screenId).classList.add('active');
+        currentScreen = screenId;
+    }
+
+    // 로그인/회원가입 관련
+    function showLogin() {
+        showScreen('loginScreen');
+    }
+
+    function showRegister() {
+        showScreen('registerScreen');
+    }
+
+    async function register() {
+        const username = document.getElementById('regUsername').value.trim();
+        const password = document.getElementById('regPassword').value;
+        const confirmPassword = document.getElementById('regPasswordConfirm').value;
+        
+        if (!username || !password || !confirmPassword) {
+            alert('모든 필드를 입력해주세요.');
+            return;
         }
+        
+        if (password !== confirmPassword) {
+            alert('비밀번호가 일치하지 않습니다.');
+            return;
+        }
+        
+        if (users.find(u => u.username === username)) {
+            alert('이미 존재하는 사용자명입니다.');
+            return;
+        }
+        
+        showScreen('loadingScreen');
+        
+        const newUser = {
+            id: Date.now(),
+            username,
+            password,
+            createdAt: new Date().toISOString()
+        };
+        
+        users.push(newUser);
+        await saveToGitHub('users.json', users);
+        
+        alert('계정이 생성되었습니다. 로그인해주세요.');
+        showScreen('loginScreen');
+        
+        // 폼 초기화
+        document.getElementById('regUsername').value = '';
+        document.getElementById('regPassword').value = '';
+        document.getElementById('regPasswordConfirm').value = '';
+    }
 
-        async function register() {
-            const username = document.getElementById('regUsername').value.trim();
-            const password = document.getElementById('regPassword').value;
-            const confirmPassword = document.getElementById('regPasswordConfirm').value;
-            
-            if (!username || !password || !confirmPassword) {
-                alert('모든 필드를 입력해주세요.');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                alert('비밀번호가 일치하지 않습니다.');
-                return;
-            }
-            
-            if (users.find(u => u.username === username)) {
-                alert('이미 존재하는 사용자명입니다.');
-                return;
-            }
-            
-            showScreen('loadingScreen');
-            
-            const newUser = {
-                id: Date.now(),
-                username,
-                password,
-                createdAt: new Date().toISOString()
-            };
-            
-            users.push(newUser);
-            await saveToGitHub('users.json', users);
-            
-            alert('계정이 생성되었습니다. 로그인해주세요.');
+    async function login() {
+        const username = document.getElementById('username').value.trim();
+        const password = document.getElementById('password').value;
+        
+        if (!username || !password) {
+            alert('사용자명과 비밀번호를 입력해주세요.');
+            return;
+        }
+        
+        showScreen('loadingScreen');
+        
+        const user = users.find(u => u.username === username && u.password === password);
+        if (user) {
+            currentUser = user;
+            localStorage.setItem('currentUser', JSON.stringify(user));
+            showServerList();
+        } else {
+            alert('잘못된 사용자명 또는 비밀번호입니다.');
             showScreen('loginScreen');
-            
-            // 폼 초기화
-            document.getElementById('regUsername').value = '';
-            document.getElementById('regPassword').value = '';
-            document.getElementById('regPasswordConfirm').value = '';
         }
+    }
 
-        async function login() {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value;
-            
-            if (!username || !password) {
-                alert('사용자명과 비밀번호를 입력해주세요.');
-                return;
-            }
-            
-            showScreen('loadingScreen');
-            
-            const user = users.find(u => u.username === username && u.password === password);
-            if (user) {
-                currentUser = user;
-                localStorage.setItem('currentUser', JSON.stringify(user));
-                showServerList();
-            } else {
-                alert('잘못된 사용자명 또는 비밀번호입니다.');
-                showScreen('loginScreen');
-            }
+    function logout() {
+        currentUser = null;
+        currentServer = null;
+        localStorage.removeItem('currentUser');
+        showScreen('loginScreen');
+    }
+
+    // 서버 관련
+    async function showServerList() {
+        showScreen('serverListScreen');
+        await loadServerList();
+    }
+
+    async function loadServerList() {
+        const serverListEl = document.getElementById('serverList');
+        
+        // 사용자가 속한 서버들 필터링 및 최근 활동 순으로 정렬
+        const userServers = servers.filter(server => 
+            server.members.includes(currentUser.username)
+        ).sort((a, b) => {
+            const lastMessageA = a.messages[a.messages.length - 1]?.timestamp || a.createdAt;
+            const lastMessageB = b.messages[b.messages.length - 1]?.timestamp || b.createdAt;
+            return new Date(lastMessageB) - new Date(lastMessageA);
+        });
+        
+        if (userServers.length === 0) {
+            serverListEl.innerHTML = '<div class="empty-state"><p>서버가 없습니다</p></div>';
+            return;
         }
+        
+        serverListEl.innerHTML = userServers.map(server => `
+            <div class="server-item" onclick="joinServerChat('${server.id}')">
+                <div class="server-name">${server.name}</div>
+                <div class="server-code">코드: ${server.code}</div>
+                <div class="server-members">멤버: ${server.members.length}명</div>
+            </div>
+        `).join('');
+    }
 
-        function logout() {
-            currentUser = null;
-            currentServer = null;
-            localStorage.removeItem('currentUser');
-            showScreen('loginScreen');
+    function showCreateServer() {
+        document.getElementById('createServerModal').classList.add('active');
+    }
+
+    function showJoinServer() {
+        document.getElementById('joinServerModal').classList.add('active');
+    }
+
+    async function createServer() {
+        const serverName = document.getElementById('serverName').value.trim();
+        
+        if (!serverName) {
+            alert('서버 이름을 입력해주세요.');
+            return;
         }
+        
+        const serverCode = generateServerCode();
+        const newServer = {
+            id: Date.now().toString(),
+            name: serverName,
+            code: serverCode,
+            owner: currentUser.username,
+            members: [currentUser.username],
+            messages: [],
+            createdAt: new Date().toISOString()
+        };
+        
+        servers.push(newServer);
+        await saveToGitHub('servers.json', servers);
+        
+        closeModal('createServerModal');
+        document.getElementById('serverName').value = '';
+        loadServerList();
+    }
 
-        // 서버 관련
-        async function showServerList() {
-            showScreen('serverListScreen');
-            await loadServerList();
+    async function joinServer() {
+        const serverCode = document.getElementById('serverCode').value.trim();
+        
+        if (!serverCode || serverCode.length !== 8) {
+            alert('8자리 서버 코드를 입력해주세요.');
+            return;
         }
-
-        async function loadServerList() {
-            const serverListEl = document.getElementById('serverList');
-            
-            // 사용자가 속한 서버들 필터링 및 최근 활동 순으로 정렬
-            const userServers = servers.filter(server => 
-                server.members.includes(currentUser.username)
-            ).sort((a, b) => {
-                const lastMessageA = a.messages[a.messages.length - 1]?.timestamp || a.createdAt;
-                const lastMessageB = b.messages[b.messages.length - 1]?.timestamp || b.createdAt;
-                return new Date(lastMessageB) - new Date(lastMessageA);
-            });
-            
-            if (userServers.length === 0) {
-                serverListEl.innerHTML = '<div class="empty-state"><p>서버가 없습니다</p></div>';
-                return;
-            }
-            
-            // 가로 모드인지 확인
-            const isLandscape = window.matchMedia("(orientation: landscape) and (max-height: 600px)").matches;
-            
-            if (isLandscape && userServers.length > 1) {
-                // 가로 모드이고 서버가 2개 이상일 때 스와이프 가능한 레이아웃
-                serverListEl.innerHTML = userServers.map(server => `
-                    <div class="server-item" onclick="joinServerChat('${server.id}')">
-                        <div class="server-name">${server.name}</div>
-                        <div class="server-code">코드: ${server.code}</div>
-                        <div class="server-members">멤버: ${server.members.length}명</div>
-                    </div>
-                `).join('');
-            } else {
-                // 일반 모드 또는 서버가 1개일 때 기존 레이아웃
-                serverListEl.innerHTML = userServers.map(server => `
-                    <div class="server-item" onclick="joinServerChat('${server.id}')">
-                        <div class="server-name">${server.name}</div>
-                        <div class="server-code">코드: ${server.code}</div>
-                        <div class="server-members">멤버: ${server.members.length}명</div>
-                    </div>
-                `).join('');
-            }
+        
+        const server = servers.find(s => s.code === serverCode);
+        if (!server) {
+            alert('존재하지 않는 서버 코드입니다.');
+            return;
         }
-
-        function showCreateServer() {
-            document.getElementById('createServerModal').classList.add('active');
+        
+        if (server.members.includes(currentUser.username)) {
+            alert('이미 참여한 서버입니다.');
+            return;
         }
+        
+        server.members.push(currentUser.username);
+        server.messages.push({
+            id: Date.now(),
+            type: 'system',
+            content: `${currentUser.username}님이 서버에 참여했습니다.`,
+            timestamp: new Date().toISOString()
+        });
+        
+        await saveToGitHub('servers.json', servers);
+        
+        closeModal('joinServerModal');
+        document.getElementById('serverCode').value = '';
+        loadServerList();
+    }
 
-        function showJoinServer() {
-            document.getElementById('joinServerModal').classList.add('active');
-        }
+    function generateServerCode() {
+        return Math.random().toString(36).substr(2, 8).toUpperCase();
+    }
 
-        async function createServer() {
-            const serverName = document.getElementById('serverName').value.trim();
-            
-            if (!serverName) {
-                alert('서버 이름을 입력해주세요.');
-                return;
-            }
-            
-            const serverCode = generateServerCode();
-            const newServer = {
-                id: Date.now().toString(),
-                name: serverName,
-                code: serverCode,
-                owner: currentUser.username,
-                members: [currentUser.username],
-                messages: [],
-                createdAt: new Date().toISOString()
-            };
-            
-            servers.push(newServer);
-            await saveToGitHub('servers.json', servers);
-            
-            closeModal('createServerModal');
-            document.getElementById('serverName').value = '';
-            loadServerList();
-        }
+    // 채팅 관련
+    async function joinServerChat(serverId) {
+        currentServer = servers.find(s => s.id === serverId);
+        if (!currentServer) return;
+        
+        document.getElementById('chatTitle').textContent = currentServer.name;
+        showScreen('chatScreen');
+        updateUserList();
+        loadMessages();
+    }
 
-        async function joinServer() {
-            const serverCode = document.getElementById('serverCode').value.trim();
-            
-            if (!serverCode || serverCode.length !== 8) {
-                alert('8자리 서버 코드를 입력해주세요.');
-                return;
-            }
-            
-            const server = servers.find(s => s.code === serverCode);
-            if (!server) {
-                alert('존재하지 않는 서버 코드입니다.');
-                return;
-            }
-            
-            if (server.members.includes(currentUser.username)) {
-                alert('이미 참여한 서버입니다.');
-                return;
-            }
-            
-            server.members.push(currentUser.username);
-            server.messages.push({
-                id: Date.now(),
-                type: 'system',
-                content: `${currentUser.username}님이 서버에 참여했습니다.`,
-                timestamp: new Date().toISOString()
-            });
-            
-            await saveToGitHub('servers.json', servers);
-            
-            closeModal('joinServerModal');
-            document.getElementById('serverCode').value = '';
-            loadServerList();
-        }
+    // 사용자 목록 토글
+    function toggleUserList() {
+        const userList = document.getElementById('userList');
+        userList.classList.toggle('show');
+    }
 
-        function generateServerCode() {
-            return Math.random().toString(36).substr(2, 8).toUpperCase();
-        }
-
-        // 채팅 관련
-        async function joinServerChat(serverId) {
-            currentServer = servers.find(s => s.id === serverId);
-            if (!currentServer) return;
-            
-            document.getElementById('chatTitle').textContent = currentServer.name;
-            showScreen('chatScreen');
-            updateUserList();
-            loadMessages();
-        }
-
-        // 사용자 목록 토글
-        function toggleUserList() {
-            const userList = document.getElementById('userList');
-            userList.classList.toggle('show');
-        }
-
-        function updateUserList() {
-            if (!currentServer) return;
-            
-            const userListEl = document.getElementById('userList');
-            const memberList = currentServer.members.map(member => {
-                const isOnline = checkUserOnlineStatus(member);
-                return `
-                    <div class="user-item">
-                        <div class="user-status ${isOnline ? 'online' : 'offline'}"></div>
-                        <span>${member} ${isOnline ? '' : '(오프라인)'}</span>
-                    </div>
-                `;
-            }).join('');
-            
-            userListEl.innerHTML = `
-                <h4 style="margin-bottom: 10px;">접속자 목록 (${currentServer.members.length})</h4>
-                ${memberList}
+    function updateUserList() {
+        if (!currentServer) return;
+        
+        const userListEl = document.getElementById('userList');
+        const memberList = currentServer.members.map(member => {
+            const isOnline = checkUserOnlineStatus(member);
+            return `
+                <div class="user-item">
+                    <div class="user-status ${isOnline ? 'online' : 'offline'}"></div>
+                    <span>${member} ${isOnline ? '' : '(오프라인)'}</span>
+                </div>
             `;
-        }
+        }).join('');
+        
+        userListEl.innerHTML = `
+            <h4 style="margin-bottom: 10px;">접속자 목록 (${currentServer.members.length})</h4>
+            ${memberList}
+        `;
+    }
 
-        function checkUserOnlineStatus(username) {
-            if (username === currentUser.username) {
-                return true;
-            }
-            return Math.random() > 0.3;
+    function checkUserOnlineStatus(username) {
+        if (username === currentUser.username) {
+            return true;
         }
+        return Math.random() > 0.3;
+    }
 
-        function loadMessages() {
-            const messagesEl = document.getElementById('chatMessages');
-            if (!currentServer.messages || currentServer.messages.length === 0) {
-                messagesEl.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">메시지가 없습니다.</div>';
-                return;
-            }
-            
-            messagesEl.innerHTML = currentServer.messages.map(msg => {
-                let messageClass = 'message ';
-                if (msg.type === 'system') {
-                    messageClass += 'system';
-                } else if (msg.username === currentUser.username) {
-                    messageClass += 'own';
-                } else {
-                    messageClass += 'other';
-                }
-                
-                return `
-                    <div class="${messageClass}">
-                        ${msg.type !== 'system' ? `<strong>${msg.username}:</strong> ` : ''}
-                        ${msg.content}
-                    </div>
-                `;
-            }).join('');
-            
-            messagesEl.scrollTop = messagesEl.scrollHeight;
+    function loadMessages() {
+        const messagesEl = document.getElementById('chatMessages');
+        if (!currentServer.messages || currentServer.messages.length === 0) {
+            messagesEl.innerHTML = '<div style="text-align: center; color: #888; padding: 20px;">메시지가 없습니다.</div>';
+            return;
         }
-
-        async function sendMessage() {
-            const messageInput = document.getElementById('messageInput');
-            const content = messageInput.value.trim();
-            
-            if (!content) return;
-            
-            const message = {
-                id: Date.now(),
-                username: currentUser.username,
-                content: content,
-                timestamp: new Date().toISOString()
-            };
-            
-            // 로컬에서 즉시 메시지 추가
-            currentServer.messages.push(message);
-            loadMessages();
-            messageInput.value = '';
-            
-            // 서버에 저장 (백그라운드)
-            try {
-                const serverIndex = servers.findIndex(s => s.id === currentServer.id);
-                if (serverIndex !== -1) {
-                    servers[serverIndex] = currentServer;
-                    await saveToGitHub('servers.json', servers);
-                }
-            } catch (error) {
-                console.error('메시지 저장 실패:', error);
-            }
-        }
-
-        // 설정 관련
-        function showServerSettings() {
-            const modal = document.getElementById('serverSettingsModal');
-            document.getElementById('displayUserId').value = currentUser.id;
-            document.getElementById('editUsername').value = currentUser.username;
-            modal.classList.add('active');
-        }
-
-        async function updateUsername() {
-            const newUsername = document.getElementById('editUsername').value.trim();
-            
-            if (!newUsername) {
-                alert('새로운 사용자명을 입력해주세요.');
-                return;
-            }
-            
-            if (newUsername === currentUser.username) {
-                alert('기존 이름과 동일합니다.');
-                return;
-            }
-            
-            if (users.find(u => u.username === newUsername)) {
-                alert('이미 존재하는 사용자명입니다.');
-                return;
-            }
-            
-            // 사용자 정보 업데이트
-            const userIndex = users.findIndex(u => u.id === currentUser.id);
-            if (userIndex !== -1) {
-                users[userIndex].username = newUsername;
-                await saveToGitHub('users.json', users);
-            }
-            
-            // 서버에서 사용자명 업데이트
-            servers.forEach(server => {
-                if (server.members.includes(currentUser.username)) {
-                    // 멤버 목록 업데이트
-                    const memberIndex = server.members.indexOf(currentUser.username);
-                    if (memberIndex !== -1) {
-                        server.members[memberIndex] = newUsername;
-                    }
-                    
-                    // 메시지 업데이트
-                    server.messages.forEach(msg => {
-                        if (msg.username === currentUser.username) {
-                            msg.username = newUsername;
-                        }
-                    });
-                    
-                    // 소유자 업데이트
-                    if (server.owner === currentUser.username) {
-                        server.owner = newUsername;
-                    }
-                }
-            });
-            
-            await saveToGitHub('servers.json', servers);
-            
-            // 현재 사용자 업데이트
-            currentUser.username = newUsername;
-            localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            
-            alert('사용자명이 변경되었습니다.');
-            closeModal('serverSettingsModal');
-        }
-
-        function showSettings() {
-            const modal = document.getElementById('settingsModal');
-            const serverNameInput = document.getElementById('editServerName');
-            const serverCodeInput = document.getElementById('displayServerCode');
-            const deleteBtn = document.getElementById('deleteLeaveBtn');
-            
-            serverNameInput.value = currentServer.name;
-            serverCodeInput.value = currentServer.code;
-            
-            // 서버 소유자인지 확인
-            if (currentServer.owner === currentUser.username) {
-                serverNameInput.disabled = false;
-                deleteBtn.textContent = '서버 삭제';
-                deleteBtn.className = 'btn btn-danger';
+        
+        messagesEl.innerHTML = currentServer.messages.map(msg => {
+            let messageClass = 'message ';
+            if (msg.type === 'system') {
+                messageClass += 'system';
+            } else if (msg.username === currentUser.username) {
+                messageClass += 'own';
             } else {
-                serverNameInput.disabled = true;
-                deleteBtn.textContent = '서버 탈퇴';
-                deleteBtn.className = 'btn btn-secondary';
+                messageClass += 'other';
             }
             
-            modal.classList.add('active');
-        }
+            return `
+                <div class="${messageClass}">
+                    ${msg.type !== 'system' ? `<strong>${msg.username}:</strong> ` : ''}
+                    ${msg.content}
+                </div>
+            `;
+        }).join('');
+        
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
 
-        async function updateServerName() {
-            if (currentServer.owner !== currentUser.username) {
-                alert('서버 이름을 변경할 권한이 없습니다.');
-                return;
-            }
-            
-            const newName = document.getElementById('editServerName').value.trim();
-            if (!newName) {
-                alert('서버 이름을 입력해주세요.');
-                return;
-            }
-            
-            currentServer.name = newName;
-            await saveToGitHub('servers.json', servers);
-            
-            document.getElementById('chatTitle').textContent = newName;
-            alert('서버 이름이 변경되었습니다.');
-        }
-
-        async function deleteOrLeaveServer() {
-            if (currentServer.owner === currentUser.username) {
-                // 서버 삭제
-                if (!confirm('서버를 삭제하면 다시 되돌릴 수 없습니다. 정말 삭제하시겠습니까?')) {
-                    return;
-                }
-                
-                servers = servers.filter(s => s.id !== currentServer.id);
+    async function sendMessage() {
+        const messageInput = document.getElementById('messageInput');
+        const content = messageInput.value.trim();
+        
+        if (!content) return;
+        
+        const message = {
+            id: Date.now(),
+            username: currentUser.username,
+            content: content,
+            timestamp: new Date().toISOString()
+        };
+        
+        // 로컬에서 즉시 메시지 추가
+        currentServer.messages.push(message);
+        loadMessages();
+        messageInput.value = '';
+        
+        // 서버에 저장 (백그라운드)
+        try {
+            const serverIndex = servers.findIndex(s => s.id === currentServer.id);
+            if (serverIndex !== -1) {
+                servers[serverIndex] = currentServer;
                 await saveToGitHub('servers.json', servers);
-                
-                alert('서버가 삭제되었습니다.');
-                closeModal('settingsModal');
-                currentServer = null;
-                await loadServerList();
-                showScreen('serverListScreen');
-            } else {
-                // 서버 탈퇴
-                if (!confirm('정말 서버에서 탈퇴하시겠습니까?')) {
-                    return;
+            }
+        } catch (error) {
+            console.error('메시지 저장 실패:', error);
+        }
+    }
+
+    // 설정 관련
+    function showServerSettings() {
+        const modal = document.getElementById('serverSettingsModal');
+        document.getElementById('displayUserId').value = currentUser.id;
+        document.getElementById('editUsername').value = currentUser.username;
+        modal.classList.add('active');
+    }
+
+    async function updateUsername() {
+        const newUsername = document.getElementById('editUsername').value.trim();
+        
+        if (!newUsername) {
+            alert('새로운 사용자명을 입력해주세요.');
+            return;
+        }
+        
+        if (newUsername === currentUser.username) {
+            alert('기존 이름과 동일합니다.');
+            return;
+        }
+        
+        if (users.find(u => u.username === newUsername)) {
+            alert('이미 존재하는 사용자명입니다.');
+            return;
+        }
+        
+        // 사용자 정보 업데이트
+        const userIndex = users.findIndex(u => u.id === currentUser.id);
+        if (userIndex !== -1) {
+            users[userIndex].username = newUsername;
+            await saveToGitHub('users.json', users);
+        }
+        
+        // 서버에서 사용자명 업데이트
+        servers.forEach(server => {
+            if (server.members.includes(currentUser.username)) {
+                // 멤버 목록 업데이트
+                const memberIndex = server.members.indexOf(currentUser.username);
+                if (memberIndex !== -1) {
+                    server.members[memberIndex] = newUsername;
                 }
                 
-                currentServer.members = currentServer.members.filter(m => m !== currentUser.username);
-                currentServer.messages.push({
-                    id: Date.now(),
-                    type: 'system',
-                    content: `${currentUser.username}님이 서버에서 탈퇴했습니다.`,
-                    timestamp: new Date().toISOString()
+                // 메시지 업데이트
+                server.messages.forEach(msg => {
+                    if (msg.username === currentUser.username) {
+                        msg.username = newUsername;
+                    }
                 });
                 
-                await saveToGitHub('servers.json', servers);
-                
-                alert('서버에서 탈퇴했습니다.');
-                closeModal('settingsModal');
-                currentServer = null;
-                await loadServerList();
-                showScreen('serverListScreen');
-            }
-        }
-
-        // 모달 관련
-        function closeModal(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
-
-        // 자동 새로고침
-        async function autoRefresh() {
-            if (!currentUser) return;
-            
-            if (currentScreen === 'serverListScreen') {
-                await loadServerList();
-            } else if (currentScreen === 'chatScreen' && currentServer) {
-                await checkForUpdates();
-            }
-        }
-
-        async function checkForUpdates() {
-            if (!currentServer) return;
-            
-            try {
-                const updatedServers = await loadFromGitHub('servers.json');
-                if (!updatedServers) return;
-                
-                const updatedCurrentServer = updatedServers.find(s => s.id === currentServer.id);
-                if (!updatedCurrentServer) {
-                    // 서버가 삭제된 경우
-                    currentServer = null;
-                    alert('이 서버는 삭제되었습니다.');
-                    showScreen('serverListScreen');
-                    return;
-                }
-                
-                // 메시지나 멤버 목록이 변경된 경우만 업데이트
-                if (updatedCurrentServer.messages.length !== currentServer.messages.length || 
-                    updatedCurrentServer.members.length !== currentServer.members.length) {
-                    currentServer = updatedCurrentServer;
-                    loadMessages();
-                    updateUserList();
-                }
-            } catch (error) {
-                console.error('업데이트 확인 오류:', error);
-            }
-        }
-
-        // 모달 외부 클릭시 닫기
-        document.addEventListener('click', function(e) {
-            if (e.target.classList.contains('modal')) {
-                e.target.classList.remove('active');
-            }
-        });
-
-        // Enter 키 이벤트 처리
-        document.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                const activeScreen = document.querySelector('.screen.active');
-                const activeModal = document.querySelector('.modal.active');
-                
-                if (activeModal) {
-                    if (activeModal.id === 'createServerModal') {
-                        createServer();
-                    } else if (activeModal.id === 'joinServerModal') {
-                        joinServer();
-                    }
-                } else if (activeScreen) {
-                    if (activeScreen.id === 'loginScreen') {
-                        login();
-                    } else if (activeScreen.id === 'registerScreen') {
-                        register();
-                    }
+                // 소유자 업데이트
+                if (server.owner === currentUser.username) {
+                    server.owner = newUsername;
                 }
             }
         });
+        
+        await saveToGitHub('servers.json', servers);
+        
+        // 현재 사용자 업데이트
+        currentUser.username = newUsername;
+        localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        
+        alert('사용자명이 변경되었습니다.');
+        closeModal('serverSettingsModal');
+    }
 
-        // 페이지 로드 시 초기화
-        window.addEventListener('load', init);
-
-        // 페이지 언로드 시 정리
-        window.addEventListener('beforeunload', function() {
-            clearInterval(refreshInterval);
-            if (currentUser) {
-                localStorage.setItem('currentUser', JSON.stringify(currentUser));
-            }
-        });
-
-        // 반응형 처리
-        function handleResize() {
-            const container = document.querySelector('.container');
-            const vh = window.innerHeight * 0.01;
-            document.documentElement.style.setProperty('--vh', `${vh}px`);
-            
-            if (window.innerWidth <= 480) {
-                container.style.maxWidth = '95%';
-                container.style.margin = '10px auto';
-            } else {
-                container.style.maxWidth = '400px';
-                container.style.margin = '0 auto';
-            }
-            
-            // 서버 목록이 있을 경우 리로드
-            if (currentScreen === 'serverListScreen') {
-                loadServerList();
-            }
+    function showSettings() {
+        const modal = document.getElementById('settingsModal');
+        const serverNameInput = document.getElementById('editServerName');
+        const serverCodeInput = document.getElementById('displayServerCode');
+        const deleteBtn = document.getElementById('deleteLeaveBtn');
+        
+        serverNameInput.value = currentServer.name;
+        serverCodeInput.value = currentServer.code;
+        
+        // 서버 소유자인지 확인
+        if (currentServer.owner === currentUser.username) {
+            serverNameInput.disabled = false;
+            deleteBtn.textContent = '서버 삭제';
+            deleteBtn.className = 'btn btn-danger';
+        } else {
+            serverNameInput.disabled = true;
+            deleteBtn.textContent = '서버 탈퇴';
+            deleteBtn.className = 'btn btn-secondary';
         }
+        
+        modal.classList.add('active');
+    }
 
-        window.addEventListener('resize', handleResize);
-        window.addEventListener('orientationchange', handleResize);
-        handleResize(); // 초기 실행
+    async function updateServerName() {
+        if (currentServer.owner !== currentUser.username) {
+            alert('서버 이름을 변경할 권한이 없습니다.');
+            return;
+        }
+        
+        const newName = document.getElementById('editServerName').value.trim();
+        if (!newName) {
+            alert('서버 이름을 입력해주세요.');
+            return;
+        }
+        
+        currentServer.name = newName;
+        await saveToGitHub('servers.json', servers);
+        
+        document.getElementById('chatTitle').textContent = newName;
+        alert('서버 이름이 변경되었습니다.');
+    }
 
-        // 터치 이벤트 최적화 (iOS 사파리)
-        document.addEventListener('touchstart', function() {}, {passive: true});
-
-        // PWA 지원을 위한 서비스 워커 등록 (선택사항)
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                // 서비스 워커 등록 코드 (실제 구현시 별도 파일 필요)
+    async function deleteOrLeaveServer() {
+        if (currentServer.owner === currentUser.username) {
+            // 서버 삭제
+            if (!confirm('서버를 삭제하면 다시 되돌릴 수 없습니다. 정말 삭제하시겠습니까?')) {
+                return;
+            }
+            
+            servers = servers.filter(s => s.id !== currentServer.id);
+            await saveToGitHub('servers.json', servers);
+            
+            alert('서버가 삭제되었습니다.');
+            closeModal('settingsModal');
+            currentServer = null;
+            await loadServerList();
+            showScreen('serverListScreen');
+        } else {
+            // 서버 탈퇴
+            if (!confirm('정말 서버에서 탈퇴하시겠습니까?')) {
+                return;
+            }
+            
+            currentServer.members = currentServer.members.filter(m => m !== currentUser.username);
+            currentServer.messages.push({
+                id: Date.now(),
+                type: 'system',
+                content: `${currentUser.username}님이 서버에서 탈퇴했습니다.`,
+                timestamp: new Date().toISOString()
             });
+            
+            await saveToGitHub('servers.json', servers);
+            
+            alert('서버에서 탈퇴했습니다.');
+            closeModal('settingsModal');
+            currentServer = null;
+            await loadServerList();
+            showScreen('serverListScreen');
         }
-    </script>
+    }
+
+    // 모달 관련
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove('active');
+    }
+
+    // 자동 새로고침
+    async function autoRefresh() {
+        if (!currentUser) return;
+        
+        if (currentScreen === 'serverListScreen') {
+            await loadServerList();
+        } else if (currentScreen === 'chatScreen' && currentServer) {
+            await checkForUpdates();
+        }
+    }
+
+    async function checkForUpdates() {
+        if (!currentServer) return;
+        
+        try {
+            const updatedServers = await loadFromGitHub('servers.json');
+            if (!updatedServers) return;
+            
+            const updatedCurrentServer = updatedServers.find(s => s.id === currentServer.id);
+            if (!updatedCurrentServer) {
+                // 서버가 삭제된 경우
+                currentServer = null;
+                alert('이 서버는 삭제되었습니다.');
+                showScreen('serverListScreen');
+                return;
+            }
+            
+            // 메시지나 멤버 목록이 변경된 경우만 업데이트
+            if (updatedCurrentServer.messages.length !== currentServer.messages.length || 
+                updatedCurrentServer.members.length !== currentServer.members.length) {
+                currentServer = updatedCurrentServer;
+                loadMessages();
+                updateUserList();
+            }
+        } catch (error) {
+            console.error('업데이트 확인 오류:', error);
+        }
+    }
+
+    // 모달 외부 클릭시 닫기
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('modal')) {
+            e.target.classList.remove('active');
+        }
+    });
+
+    // Enter 키 이벤트 처리
+    document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const activeScreen = document.querySelector('.screen.active');
+            const activeModal = document.querySelector('.modal.active');
+            
+            if (activeModal) {
+                if (activeModal.id === 'createServerModal') {
+                    createServer();
+                } else if (activeModal.id === 'joinServerModal') {
+                    joinServer();
+                }
+            } else if (activeScreen) {
+                if (activeScreen.id === 'loginScreen') {
+                    login();
+                } else if (activeScreen.id === 'registerScreen') {
+                    register();
+                }
+            }
+        }
+    });
+
+    // 페이지 로드 시 초기화
+    window.addEventListener('load', init);
+
+    // 페이지 언로드 시 정리
+    window.addEventListener('beforeunload', function() {
+        clearInterval(refreshInterval);
+        if (currentUser) {
+            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+        }
+    });
+
+    // 반응형 처리
+    function handleResize() {
+        const container = document.querySelector('.container');
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty('--vh', `${vh}px`);
+        
+        if (window.innerWidth <= 480) {
+            container.style.maxWidth = '95%';
+            container.style.margin = '10px auto';
+        } else {
+            container.style.maxWidth = '400px';
+            container.style.margin = '0 auto';
+        }
+    }
+
+    window.addEventListener('resize', handleResize);
+    window.addEventListener('orientationchange', handleResize);
+    handleResize(); // 초기 실행
+
+    // 터치 이벤트 최적화 (iOS 사파리)
+    document.addEventListener('touchstart', function() {}, {passive: true});
+
+    // PWA 지원을 위한 서비스 워커 등록 (선택사항)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            // 서비스 워커 등록 코드 (실제 구현시 별도 파일 필요)
+        });
+    }
+</script>
 </body>
 </html>
