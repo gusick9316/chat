@@ -85,7 +85,14 @@
     "members": [
       "김구식"
     ],
-    "messages": [],
+    "messages": [
+      {
+        "id": 1751411196967,
+        "username": "김구식",
+        "content": "ㅎㅇ",
+        "timestamp": "2025-07-01T23:06:36.967Z"
+      }
+    ],
     "createdAt": "2025-07-01T23:06:28.288Z"
   }
 ]
