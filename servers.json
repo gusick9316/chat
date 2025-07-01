@@ -5,9 +5,17 @@
     "code": "DEWJ1G3U",
     "owner": "와즈",
     "members": [
-      "와즈"
+      "와즈",
+      "2waz1qax"
     ],
-    "messages": [],
+    "messages": [
+      {
+        "id": 1751407109767,
+        "type": "system",
+        "content": "2waz1qax님이 서버에 참여했습니다.",
+        "timestamp": "2025-07-01T21:58:29.767Z"
+      }
+    ],
     "createdAt": "2025-07-01T21:54:37.268Z"
   }
 ]
