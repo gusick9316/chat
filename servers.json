@@ -83,9 +83,17 @@
     "code": "M0N6HZOG",
     "owner": "구식이",
     "members": [
-      "구식이"
+      "구식이",
+      "김구식"
     ],
-    "messages": [],
+    "messages": [
+      {
+        "id": 1751411750027,
+        "type": "system",
+        "content": "김구식님이 서버에 참여했습니다.",
+        "timestamp": "2025-07-01T23:15:50.027Z"
+      }
+    ],
     "createdAt": "2025-07-01T23:13:22.949Z"
   }
 ]
