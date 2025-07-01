@@ -5,9 +5,17 @@
     "code": "JK4WUMV8",
     "owner": "Gusick",
     "members": [
-      "Gusick"
+      "Gusick",
+      "Waz"
     ],
-    "messages": [],
+    "messages": [
+      {
+        "id": 1751389697219,
+        "type": "system",
+        "content": "Waz님이 서버에 참여했습니다.",
+        "timestamp": "2025-07-01T17:08:17.219Z"
+      }
+    ],
     "createdAt": "2025-07-01T17:07:57.365Z"
   }
 ]
