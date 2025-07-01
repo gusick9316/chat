@@ -32,7 +32,14 @@
     "members": [
       "Waz"
     ],
-    "messages": [],
+    "messages": [
+      {
+        "id": 1751387149393,
+        "username": "Waz",
+        "content": "ㄷ",
+        "timestamp": "2025-07-01T16:25:49.393Z"
+      }
+    ],
     "createdAt": "2025-07-01T16:25:23.448Z"
   }
 ]
