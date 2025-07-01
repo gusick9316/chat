@@ -4,5 +4,10 @@
     "content": "ㅎㅇ",
     "timestamp": "2025-07-01T11:32:09.586Z",
     "type": "user"
+  },
+  {
+    "type": "system",
+    "content": "Gusick님이 서버에 참여했습니다.",
+    "timestamp": "2025-07-01T11:34:19.490Z"
   }
 ]
